@@ -41,3 +41,9 @@ export interface User {
     updated_at: string;
     [key: string]: unknown; // This allows for additional properties...
 }
+
+export interface CardItemProps {
+    hotelName: string;
+    location: string;
+    price: string | number;
+}
