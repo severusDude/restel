@@ -1,6 +1,6 @@
-import { RestelBanner } from '@/components/restel-banner';
+import { RestelBanner } from '@/components/home/restel-banner';
 import { Header }from '@/components/restel-header';
-import { MainHome } from '@/components/restel-main-home';
+import { MainHome } from '@/components/home/restel-main-home';
 import { Footer } from '@/components/restel-footer';
 
 export  default function Home() {
