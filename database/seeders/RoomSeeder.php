@@ -2,8 +2,9 @@
 
 namespace Database\Seeders;
 
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+use App\Models\Room;
 use Illuminate\Database\Seeder;
+use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
 class RoomSeeder extends Seeder
 {
@@ -12,6 +13,8 @@ class RoomSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        Room::factory()->count(5)->fromTemplate('Deluxe King')->create();
+        Room::factory()->count(10)->fromTemplate('Standard Twin')->create();
+        Room::factory()->count(30)->fromTemplate('Suite')->create();
     }
 }

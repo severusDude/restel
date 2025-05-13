@@ -45,7 +45,9 @@ class Room extends Model
             $model->id = (string) Str::orderedUuid();
 
             if ($model->slug === null) {
-                $model->slug = Str::slug($model->name);
+                $slug = Str::slug($model->name) . '-' . $model->location;
+
+                $model->slug = $slug;
             }
         });
     }
