@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('facilities', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->string('name');
+            $table->string('type');
             $table->foreignUuid('default_image_id')->nullable()->constrained('attachments')->nullOnDelete();
             $table->timestamps();
         });
