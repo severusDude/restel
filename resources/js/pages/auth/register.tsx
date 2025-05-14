@@ -2,8 +2,8 @@ import { Head, useForm } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
 import { FormEventHandler } from 'react';
 
-// import InputError from '@/components/input-error';
-// import TextLink from '@/components/text-link';
+import InputError from '@/components/input-error';
+import TextLink from '@/components/text-link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -36,7 +36,7 @@ export default function Register() {
             <Head title="Register" />
             <form className="flex flex-col gap-6" onSubmit={submit}>
                 <div className="grid gap-6">
-                    {/* <div className="grid gap-2">
+                    <div className="grid gap-2">
                         <Label htmlFor="name">Name</Label>
                         <Input
                             id="name"
@@ -51,9 +51,9 @@ export default function Register() {
                             placeholder="Full name"
                         />
                         <InputError message={errors.name} className="mt-2" />
-                    </div> */}
+                    </div>
 
-                    {/* <div className="grid gap-2">
+                    <div className="grid gap-2">
                         <Label htmlFor="email">Email address</Label>
                         <Input
                             id="email"
@@ -67,9 +67,9 @@ export default function Register() {
                             placeholder="email@example.com"
                         />
                         <InputError message={errors.email} />
-                    </div> */}
+                    </div>
 
-                    {/* <div className="grid gap-2">
+                    <div className="grid gap-2">
                         <Label htmlFor="password">Password</Label>
                         <Input
                             id="password"
@@ -83,9 +83,9 @@ export default function Register() {
                             placeholder="Password"
                         />
                         <InputError message={errors.password} />
-                    </div> */}
+                    </div>
 
-                    {/* <div className="grid gap-2">
+                    <div className="grid gap-2">
                         <Label htmlFor="password_confirmation">Confirm password</Label>
                         <Input
                             id="password_confirmation"
@@ -99,7 +99,7 @@ export default function Register() {
                             placeholder="Confirm password"
                         />
                         <InputError message={errors.password_confirmation} />
-                    </div> */}
+                    </div>
 
                     <Button type="submit" className="mt-2 w-full" tabIndex={5} disabled={processing}>
                         {processing && <LoaderCircle className="h-4 w-4 animate-spin" />}
