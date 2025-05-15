@@ -34,5 +34,16 @@ class Reservation extends Model
         static::creating(function ($model) {
             $model->id = (string) Str::orderedUuid();
         });
+
+        static::updating(function ($model) {
+            if ($model->isDirty('status')) {
+                $model->status_date = now();
+            }
+
+            if ($model->isDirty() && $model->relationLoaded('items')) {
+                $totalPrice = $model->items->sum('price');
+                $model->totalPrice = $totalPrice;
+            }
+        });
     }
 }

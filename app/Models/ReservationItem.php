@@ -24,6 +24,16 @@ class ReservationItem extends Model
     {
         static::creating(function ($model) {
             $model->id = (string) Str::orderedUuid();
+
+            // Load the reservable relation if not already loaded
+            if (!$model->relationLoaded('reservable')) {
+                $model->load('reservable');
+            }
+
+            // Set the price from reservable
+            if ($model->reservable) {
+                $model->price = $model->reservable->price;
+            }
         });
     }
 }

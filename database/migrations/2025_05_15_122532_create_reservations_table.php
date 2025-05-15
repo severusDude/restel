@@ -23,6 +23,7 @@ return new class extends Migration
                 'cancelled',
                 'success'
             ])->default('pending');
+            $table->timestamp('status_date')->nullable();
             $table->timestamps();
         });
     }
