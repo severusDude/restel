@@ -52,6 +52,16 @@ class User extends Authenticatable
         ];
     }
 
+    public function reservations()
+    {
+        return $this->hasMany(Reservation::class);
+    }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
+
     public static function booted(): void
     {
         static::creating(function ($user) {

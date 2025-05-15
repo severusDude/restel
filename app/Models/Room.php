@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\HasAttachments;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Mail\Attachable;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Room extends Model
 {
     /** @use HasFactory<\Database\Factories\RoomFactory> */
-    use HasFactory;
+    use HasFactory, HasAttachments;
 
     protected $fillable = [
         'name',
@@ -36,11 +37,6 @@ class Room extends Model
         });
     }
 
-    public function attachments()
-    {
-        return $this->morphMany(Attachment::class, 'attachable');
-    }
-
     public function facilities()
     {
         return $this->belongsToMany(Facility::class)->withPivot('custom_image_id')->withTimestamps();
@@ -51,9 +47,20 @@ class Room extends Model
         return $this->morphMany(ReservationItem::class, 'reservable');
     }
 
+    public function reviews()
+    {
+        return $this->hasManyThrough(Review::class, ReservationItem::class, 'reservable_id')
+            ->where('reservation_items.reservable_type', self::class);
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function getAverageRating(): float
+    {
+        return $this->reviews()->avg('rating');
     }
 
     public static function booted(): void
