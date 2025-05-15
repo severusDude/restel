@@ -30,7 +30,9 @@ class Room extends Model
     protected function available(Builder $query): void
     {
         $query->whereDoesntHave('reservations', function ($q) {
-            $q->where('status', 'confirmed');
+            $q->whereHas('reservation', function ($q) {
+                $q->where('status', 'confirmed');
+            });
         });
     }
 
