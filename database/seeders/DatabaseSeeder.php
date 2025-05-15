@@ -16,7 +16,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             UserSeeder::class,
             FacilitySeeder::class,
-            RoomSeeder::class
+            RoomSeeder::class,
+            ReservationSeeder::class,
         ]);
     }
 }
