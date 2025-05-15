@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Mail\Attachable;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Mail\Attachable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Room extends Model
@@ -24,6 +26,16 @@ class Room extends Model
     protected $keyType = 'string';
     public $incrementing = false;
 
+    #[Scope]
+    protected function available(Builder $query): void
+    {
+        $query->whereDoesntHave('reservations', function ($q) {
+            $q->whereHas('reservation', function ($q) {
+                $q->where('status', 'confirmed');
+            });
+        });
+    }
+
     public function attachments()
     {
         return $this->morphMany(Attachment::class, 'attachable');
@@ -32,6 +44,11 @@ class Room extends Model
     public function facilities()
     {
         return $this->belongsToMany(Facility::class)->withPivot('custom_image_id')->withTimestamps();
+    }
+
+    public function reservations()
+    {
+        return $this->morphMany(ReservationItem::class, 'reservable');
     }
 
     public function getRouteKeyName(): string

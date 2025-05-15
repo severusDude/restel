@@ -11,12 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('attachments', function (Blueprint $table) {
+        Schema::create('reservation_items', function (Blueprint $table) {
             $table->uuid('id')->primary();
-            $table->string('name')->nullable();
-            $table->string('path');
-            $table->string('type')->nullable();
-            $table->uuidMorphs('attachable');
+            $table->foreignUuid('reservation_id')->constrained('reservations')->cascadeOnDelete();
+            $table->uuidMorphs('reservable');
+            $table->float('price');
             $table->timestamps();
         });
     }
@@ -26,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('attachments');
+        Schema::dropIfExists('reservation_items');
     }
 };
