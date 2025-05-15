@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\HasAttachments;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Review extends Model
 {
     /** @use HasFactory<\Database\Factories\ReviewFactory> */
-    use HasFactory;
+    use HasFactory, HasAttachments;
 
     protected $fillable = [
         'rating',

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\HasAttachments;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Mail\Attachable;
@@ -12,7 +13,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Room extends Model
 {
     /** @use HasFactory<\Database\Factories\RoomFactory> */
-    use HasFactory;
+    use HasFactory, HasAttachments;
 
     protected $fillable = [
         'name',
@@ -34,11 +35,6 @@ class Room extends Model
                 $q->where('status', 'confirmed');
             });
         });
-    }
-
-    public function attachments()
-    {
-        return $this->morphMany(Attachment::class, 'attachable');
     }
 
     public function facilities()
