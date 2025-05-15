@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('reservation_items', function (Blueprint $table) {
             $table->uuid('id')->primary();
+            $table->foreignUuid('reservation_id')->constrained('reservations')->cascadeOnDelete();
             $table->morphs('reservable');
             $table->float('price');
             $table->timestamps();
