@@ -24,6 +24,11 @@ class Reservation extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function items()
+    {
+        return $this->hasMany(ReservationItem::class);
+    }
+
     public static function booted(): void
     {
         static::creating(function ($model) {
