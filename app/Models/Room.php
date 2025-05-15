@@ -51,9 +51,20 @@ class Room extends Model
         return $this->morphMany(ReservationItem::class, 'reservable');
     }
 
+    public function reviews()
+    {
+        return $this->hasManyThrough(Review::class, ReservationItem::class, 'reservable_id')
+            ->where('reservation_items.reservable_type', self::class);
+    }
+
     public function getRouteKeyName(): string
     {
         return 'slug';
+    }
+
+    public function getAverageRating(): float
+    {
+        return $this->reviews()->avg('rating');
     }
 
     public static function booted(): void

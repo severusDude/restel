@@ -18,6 +18,11 @@ class ReservationItem extends Model
         return $this->belongsTo(Reservation::class);
     }
 
+    public function review()
+    {
+        return $this->hasOne(Review::class);
+    }
+
     public function reservable()
     {
         return $this->morphTo();
