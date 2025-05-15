@@ -2,9 +2,12 @@
 
 namespace App\Models;
 
+use App\Observers\ReservationItemObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
+#[ObservedBy([ReservationItemObserver::class])]
 class ReservationItem extends Model
 {
     protected $keyType = 'string';

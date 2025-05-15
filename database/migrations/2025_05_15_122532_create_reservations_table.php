@@ -16,7 +16,7 @@ return new class extends Migration
             $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
             $table->dateTime('start_date');
             $table->dateTime('end_date');
-            $table->float('total_price');
+            $table->float('total_price')->nullable();
             $table->enum('status', [
                 'pending',
                 'confirmed',

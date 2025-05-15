@@ -2,10 +2,13 @@
 
 namespace App\Models;
 
+use App\Observers\ReservationObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+#[ObservedBy([ReservationObserver::class])]
 class Reservation extends Model
 {
     /** @use HasFactory<\Database\Factories\ReservationFactory> */
@@ -18,6 +21,12 @@ class Reservation extends Model
     ];
     protected $keyType = 'string';
     public $incrementing = false;
+
+    public function updateTotalPrice(): void
+    {
+        $this->total_price = $this->items->sum('price');
+        $this->saveQuietly(); // Prevents recursive observer events
+    }
 
     public function user()
     {
@@ -33,17 +42,6 @@ class Reservation extends Model
     {
         static::creating(function ($model) {
             $model->id = (string) Str::orderedUuid();
-        });
-
-        static::updating(function ($model) {
-            if ($model->isDirty('status')) {
-                $model->status_date = now();
-            }
-
-            if ($model->isDirty() && $model->relationLoaded('items')) {
-                $totalPrice = $model->items->sum('price');
-                $model->totalPrice = $totalPrice;
-            }
         });
     }
 }
