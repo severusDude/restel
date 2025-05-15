@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->string('path');
             $table->string('type')->nullable();
-            $table->morphs('attachable');
+            $table->uuidMorphs('attachable');
             $table->timestamps();
         });
     }
