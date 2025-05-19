@@ -67,11 +67,15 @@ class RoomController extends Controller
      */
     public function show(Room $room)
     {
-        $room->load('facilities');
+        $room->load(['facilities', 'reviews']);
 
-        dd($room);
+        // Debug
+        dd($room->getAverageRating(), $room);
 
-        return Inertia::render('detail');
+        return Inertia::render('detail', [
+            'room' => $room,
+            'rating' => $room->getAverageRating()
+        ]);
     }
 
     /**
