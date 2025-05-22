@@ -23,6 +23,7 @@ class Room extends Model
         'capacity',
         'location',
         'price',
+        'featured_image',
     ];
     protected $keyType = 'string';
     public $incrementing = false;
@@ -60,7 +61,8 @@ class Room extends Model
 
     public function getAverageRating(): float
     {
-        return $this->reviews()->avg('rating');
+        $average = $this->reviews()->avg('rating');
+        return $average === null ? 0.0 : (float)$average;
     }
 
     public static function booted(): void

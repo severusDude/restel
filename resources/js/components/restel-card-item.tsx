@@ -1,14 +1,22 @@
 import { CardItemProps } from "@/types";
 
+export interface ExtendedCardItemProps extends CardItemProps {
+  rating?: number;
+  image?: string;
+}
 
-export function CardItem({ hotelName, location, price }: CardItemProps) {
+export function CardItem({ hotelName, location, price, rating = 4.8, image }: ExtendedCardItemProps) {
   return (
     <>
       <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-shadow duration-300">
         <div className="relative">
-          <img src="https://source.unsplash.com/random/400x250/?hotel,1" alt="Hotel A" className="w-full h-48 object-cover" />
+          <img 
+            src={image || "https://source.unsplash.com/random/400x250/?hotel,1"} 
+            alt={hotelName} 
+            className="w-full h-48 object-cover" 
+          />
           <div className="absolute top-2 right-2 bg-yellow-400 text-xs font-bold px-2 py-1 rounded-full flex items-center">
-            ★ 4.8
+            ★ {rating.toFixed(1)}
           </div>
         </div>
 
@@ -22,6 +30,5 @@ export function CardItem({ hotelName, location, price }: CardItemProps) {
         </div>
       </div>
     </>
-    
   )
 }

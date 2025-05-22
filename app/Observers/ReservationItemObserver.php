@@ -11,7 +11,10 @@ class ReservationItemObserver
      */
     public function created(ReservationItem $reservationItem): void
     {
-        //
+        // Update the reservation's total price when a new item is added
+        if ($reservationItem->reservation) {
+            $reservationItem->reservation->updateTotalPrice();
+        }
     }
 
     /**
@@ -19,7 +22,10 @@ class ReservationItemObserver
      */
     public function updated(ReservationItem $reservationItem): void
     {
-        //
+        // Update the reservation's total price when an item is updated
+        if ($reservationItem->reservation && $reservationItem->isDirty('price')) {
+            $reservationItem->reservation->updateTotalPrice();
+        }
     }
 
     /**
@@ -27,6 +33,7 @@ class ReservationItemObserver
      */
     public function deleted(ReservationItem $reservationItem): void
     {
+        // Update the reservation's total price when an item is removed
         if ($reservationItem->reservation) {
             $reservationItem->reservation->updateTotalPrice();
         }

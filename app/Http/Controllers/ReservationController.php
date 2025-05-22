@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Reservation;
-use App\Models\ReservationItem;
 use App\Models\Room;
+use App\Models\ReservationItem;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class ReservationController extends Controller
@@ -16,13 +16,9 @@ class ReservationController extends Controller
      */
     public function index()
     {
-        $reservations = Reservation::with(['items.room', 'user'])
-            ->where('user_id', auth()->id())
-            ->orderBy('created_at', 'desc')
-            ->get();
-
+        $reservations = Auth::user()->reservations()->with('items.reservable', 'items.review')->latest()->get();
         return Inertia::render('Reservations/Index', [
-            'reservations' => $reservations,
+            'reservations' => $reservations
         ]);
     }
 
@@ -39,66 +35,38 @@ class ReservationController extends Controller
      */
     public function store(Request $request)
     {
-        $validated = $request->validate([
+        $request->validate([
             'room_id' => 'required|exists:rooms,id',
             'start_date' => 'required|date|after_or_equal:today',
             'end_date' => 'required|date|after:start_date',
         ]);
 
-        $room = Room::findOrFail($validated['room_id']);
+        $room = Room::findOrFail($request->room_id);
 
-        // Check if room is available for the selected dates
-        $conflictingReservations = ReservationItem::whereHas('reservation', function ($query) use ($validated) {
-            $query->where('status', '!=', 'cancelled')
-                ->where(function ($query) use ($validated) {
-                    $query->whereBetween('start_date', [$validated['start_date'], $validated['end_date']])
-                        ->orWhereBetween('end_date', [$validated['start_date'], $validated['end_date']])
-                        ->orWhere(function ($query) use ($validated) {
-                            $query->where('start_date', '<=', $validated['start_date'])
-                                ->where('end_date', '>=', $validated['end_date']);
-                        });
-                });
-        })->where('room_id', $room->id)->exists();
-
-        if ($conflictingReservations) {
-            return back()->withErrors([
-                'dates' => 'The room is not available for the selected dates.',
-            ]);
+        // Check if room is available for the requested dates
+        $isAvailable = $this->checkRoomAvailability($room->id, $request->start_date, $request->end_date);
+        
+        if (!$isAvailable) {
+            return back()->with('error', 'Room is not available for the selected dates');
         }
 
-        // Calculate total price
-        $startDate = new \DateTime($validated['start_date']);
-        $endDate = new \DateTime($validated['end_date']);
-        $days = $startDate->diff($endDate)->days;
-        $totalPrice = $room->price * $days;
+        // Create reservation
+        $reservation = new Reservation();
+        $reservation->user_id = Auth::id();
+        $reservation->start_date = $request->start_date;
+        $reservation->end_date = $request->end_date;
+        $reservation->status = 'pending';
+        $reservation->save();
 
-        DB::beginTransaction();
+        // Create reservation item
+        $item = new ReservationItem();
+        $item->reservation_id = $reservation->id;
+        $item->reservable_id = $room->id;
+        $item->reservable_type = Room::class;
+        $item->save();
 
-        try {
-            $reservation = Reservation::create([
-                'user_id' => auth()->id(),
-                'start_date' => $validated['start_date'],
-                'end_date' => $validated['end_date'],
-                'total_price' => $totalPrice,
-                'status' => 'pending',
-            ]);
-
-            ReservationItem::create([
-                'reservation_id' => $reservation->id,
-                'room_id' => $room->id,
-                'price' => $room->price,
-            ]);
-
-            DB::commit();
-
-            return redirect()->route('reservations.index')
-                ->with('success', 'Reservation created successfully.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return back()->withErrors([
-                'error' => 'An error occurred while creating your reservation.',
-            ]);
-        }
+        return redirect()->route('reservations.show', $reservation->id)
+            ->with('success', 'Reservation created successfully');
     }
 
     /**
@@ -106,7 +74,16 @@ class ReservationController extends Controller
      */
     public function show(Reservation $reservation)
     {
-        //
+        // Check if the reservation belongs to the authenticated user
+        if ($reservation->user_id !== Auth::id()) {
+            abort(403);
+        }
+
+        $reservation->load('items.reservable', 'items.review');
+        
+        return Inertia::render('Reservations/Show', [
+            'reservation' => $reservation
+        ]);
     }
 
     /**
@@ -130,18 +107,55 @@ class ReservationController extends Controller
      */
     public function destroy(Reservation $reservation)
     {
-        if ($reservation->user_id !== auth()->id()) {
+        //
+    }
+
+    public function confirm(Reservation $reservation)
+    {
+        // In a real system, this would be called after payment confirmation
+        if ($reservation->user_id !== Auth::id()) {
             abort(403);
         }
 
-        if ($reservation->status !== 'pending') {
-            return back()->withErrors([
-                'error' => 'Only pending reservations can be cancelled.',
-            ]);
+        $reservation->status = 'confirmed';
+        $reservation->save();
+
+        return redirect()->route('reservations.show', $reservation->id)
+            ->with('success', 'Reservation confirmed successfully');
+    }
+
+    public function cancel(Reservation $reservation)
+    {
+        if ($reservation->user_id !== Auth::id()) {
+            abort(403);
         }
 
-        $reservation->update(['status' => 'cancelled']);
+        $reservation->status = 'cancelled';
+        $reservation->save();
 
-        return back()->with('success', 'Reservation cancelled successfully.');
+        return redirect()->route('reservations.index')
+            ->with('success', 'Reservation cancelled successfully');
+    }
+
+    private function checkRoomAvailability($roomId, $startDate, $endDate)
+    {
+        // Count existing confirmed reservations for the same room and overlapping dates
+        $overlappingReservations = ReservationItem::where('reservable_id', $roomId)
+            ->where('reservable_type', Room::class)
+            ->whereHas('reservation', function ($query) use ($startDate, $endDate) {
+                $query->where('status', 'confirmed')
+                    ->where(function ($q) use ($startDate, $endDate) {
+                        // Check for date overlaps
+                        $q->whereBetween('start_date', [$startDate, $endDate])
+                            ->orWhereBetween('end_date', [$startDate, $endDate])
+                            ->orWhere(function ($q) use ($startDate, $endDate) {
+                                $q->where('start_date', '<=', $startDate)
+                                    ->where('end_date', '>=', $endDate);
+                            });
+                    });
+            })
+            ->count();
+
+        return $overlappingReservations === 0;
     }
 }
