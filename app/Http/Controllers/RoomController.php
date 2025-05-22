@@ -13,11 +13,16 @@ class RoomController extends Controller
      */
     public function index()
     {
-        $rooms = Room::all();
+        $rooms = Room::with(['facilities', 'attachments'])
+            ->orderBy('created_at', 'desc')
+            ->get();
 
-        dd($rooms);
+        $types = Room::distinct('type')->pluck('type');
 
-        return;
+        return Inertia::render('Rooms/Index', [
+            'rooms' => $rooms,
+            'types' => $types,
+        ]);
     }
 
     public function filter(Request $request)
@@ -67,14 +72,10 @@ class RoomController extends Controller
      */
     public function show(Room $room)
     {
-        $room->load(['facilities', 'reviews']);
+        $room->load(['facilities.default_image', 'reviews.user']);
 
-        // Debug
-        dd($room->getAverageRating(), $room);
-
-        return Inertia::render('detail', [
+        return Inertia::render('Rooms/Show', [
             'room' => $room,
-            'rating' => $room->getAverageRating()
         ]);
     }
 
