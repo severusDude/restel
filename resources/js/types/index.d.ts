@@ -46,4 +46,5 @@ export interface CardItemProps {
     hotelName: string;
     location: string;
     price: string | number;
+    slug: string
 }

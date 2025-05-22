@@ -1,7 +1,7 @@
 import { CardList } from "@/components/restel-card-list";
 
 
-export function MainHome() {
+export function MainHome({ rooms }: { rooms: any[] }) {
   return (
     <>
       <main className="max-w-6xl mx-auto px-6 py-6">
@@ -16,7 +16,7 @@ export function MainHome() {
         </div>
         
         {/* card list */}
-        <CardList />
+        <CardList rooms={rooms}/>
       </main>
     </>
   )

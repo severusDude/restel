@@ -58,7 +58,7 @@ class Room extends Model
         return 'slug';
     }
 
-    public function getAverageRating(): float
+    public function getAverageRating()
     {
         return $this->reviews()->avg('rating');
     }

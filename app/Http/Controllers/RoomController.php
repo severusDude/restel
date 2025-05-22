@@ -15,13 +15,14 @@ class RoomController extends Controller
     {
         $rooms = Room::all();
 
-        dd($rooms);
-
-        return;
+        return Inertia::render('home', [
+            'rooms' => $rooms
+        ]);
     }
 
     public function filter(Request $request)
-    {
+    {   
+        // dd("hah");
         $query = Room::query();
 
         // Filter by capacity if provided
@@ -67,10 +68,11 @@ class RoomController extends Controller
      */
     public function show(Room $room)
     {
+        // dd($room);
         $room->load(['facilities', 'reviews']);
 
         // Debug
-        dd($room->getAverageRating(), $room);
+        // dd($room->getAverageRating(), $room);
 
         return Inertia::render('detail', [
             'room' => $room,

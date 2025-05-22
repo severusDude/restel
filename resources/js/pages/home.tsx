@@ -3,13 +3,14 @@ import { Header }from '@/components/restel-header';
 import { MainHome } from '@/components/home/restel-main-home';
 import { Footer } from '@/components/restel-footer';
 
-export  default function Home() {
+
+export  default function Home({ rooms }: { rooms: any[] }) {
   return (
     <>
       <Header />
       <RestelBanner />
       <div className="h-28"></div>
-      <MainHome />
+      <MainHome rooms={rooms} />
       <Footer />
     </>
   )
