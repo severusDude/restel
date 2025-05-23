@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { PageProps, Room } from '@/types';
 import { AppShell } from '@/Components/app-shell';
-import { formatRupiah } from '@/helpers/currency';
 
 interface Props extends PageProps {
   rooms: Room[];
@@ -15,13 +14,13 @@ export default function Index({ auth, rooms }: Props) {
   const [location, setLocation] = useState<string>('');
   
   // Formatted price display
-  const [minPriceDisplay, setMinPriceDisplay] = useState<string>(formatRupiah(0));
-  const [maxPriceDisplay, setMaxPriceDisplay] = useState<string>(formatRupiah(5000000));
+  const [minPriceDisplay, setMinPriceDisplay] = useState<string>('Rp 0');
+  const [maxPriceDisplay, setMaxPriceDisplay] = useState<string>('Rp 5.000.000');
 
   // Update formatted price when price range changes
   useEffect(() => {
-    setMinPriceDisplay(formatRupiah(priceRange[0]));
-    setMaxPriceDisplay(formatRupiah(priceRange[1]));
+    setMinPriceDisplay(`Rp ${priceRange[0].toLocaleString()}`);
+    setMaxPriceDisplay(`Rp ${priceRange[1].toLocaleString()}`);
   }, [priceRange]);
 
   const handleFilter = (e: React.FormEvent) => {

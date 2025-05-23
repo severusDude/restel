@@ -55,6 +55,16 @@ export function Navbar() {
                     </div>
                   </div>
                 </div>
+              
+                <Link 
+                  href={route('dashboard')}
+                  className="px-4 py-2 border border-blue-100 rounded-full text-blue-600 hover:bg-blue-50 transition-all duration-200 font-medium flex items-center gap-1"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+                  </svg>
+                  <span>Dashboard</span>
+                </Link>
                 
                 <Link 
                   href={route('logout')}

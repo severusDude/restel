@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Helpers\CurrencyHelper;
 use App\Http\Controllers\Controller;
 use App\Models\Reservation;
 use App\Models\Room;
@@ -25,10 +24,10 @@ class DashboardController extends Controller
                 'cancelled' => Reservation::where('status', 'cancelled')->count(),
             ],
             'revenue' => [
-                'total' => CurrencyHelper::formatRupiah(Reservation::where('status', 'confirmed')->sum('total_price')),
-                'monthly' => CurrencyHelper::formatRupiah(Reservation::where('status', 'confirmed')
+                'total' => Reservation::where('status', 'confirmed')->sum('total_price'),
+                'monthly' => Reservation::where('status', 'confirmed')
                     ->whereMonth('created_at', now()->month)
-                    ->sum('total_price')),
+                    ->sum('total_price'),
             ]
         ];
 

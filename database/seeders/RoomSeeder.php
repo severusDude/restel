@@ -11,10 +11,17 @@ class RoomSeeder extends Seeder
     /**
      * Run the database seeds.
      */
-    public function run(): void
-    {
-        Room::factory()->count(5)->fromTemplate('Deluxe King')->create();
-        Room::factory()->count(10)->fromTemplate('Standard Twin')->create();
-        Room::factory()->count(30)->fromTemplate('Suite')->create();
+   public function run(): void
+{
+    $types = [
+        'Deluxe King', 'Standard Twin', 'Suite', 'Family Room', 'Executive', 'Presidential', 'Single', 'Double',
+        'Queen', 'King', 'Junior Suite', 'Studio', 'Penthouse', 'Cabana', 'Villa', 'Bungalow', 'Loft', 'Apartment',
+        'Superior', 'Economy', 'Business', 'Luxury', 'Classic', 'Modern', 'Heritage', 'Garden View', 'Sea View',
+        'Mountain View', 'Pool Access', 'Balcony'
+    ];
+
+    foreach ($types as $type) {
+        \App\Models\Room::factory()->fromTemplate($type)->create();
     }
+}
 }
