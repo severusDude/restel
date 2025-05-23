@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Head, Link } from '@inertiajs/react';
 import { PageProps, Room } from '@/types';
 import { AppShell } from '@/Components/app-shell';
@@ -17,11 +17,21 @@ interface Props extends PageProps {
 export default function SearchResults({ auth, rooms, filters }: Props) {
   const [priceRange, setPriceRange] = useState<[number, number]>([
     filters.min_price || 0,
-    filters.max_price || 1000
+    filters.max_price || 5000000
   ]);
   const [capacity, setCapacity] = useState<number>(filters.capacity || 1);
   const [roomType, setRoomType] = useState<string>(filters.type || '');
   const [location, setLocation] = useState<string>(filters.location || '');
+  
+  // Formatted price display
+  const [minPriceDisplay, setMinPriceDisplay] = useState<string>(`Rp ${(filters.min_price || 0).toLocaleString()}`);
+  const [maxPriceDisplay, setMaxPriceDisplay] = useState<string>(`Rp ${(filters.max_price || 5000000).toLocaleString()}`);
+
+  // Update formatted price when price range changes
+  useEffect(() => {
+    setMinPriceDisplay(`Rp ${priceRange[0].toLocaleString()}`);
+    setMaxPriceDisplay(`Rp ${priceRange[1].toLocaleString()}`);
+  }, [priceRange]);
 
   const handleFilter = (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +48,18 @@ export default function SearchResults({ auth, rooms, filters }: Props) {
     <AppShell>
       <Head title="Hasil Pencarian" />
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-2">Hasil Pencarian</h1>
+        <div className="flex items-center mb-2">
+          <Link
+            href={route('rooms.index')}
+            className="inline-flex items-center mr-4 text-blue-600 hover:text-blue-800"
+          >
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <span>Kembali ke Daftar</span>
+          </Link>
+          <h1 className="text-3xl font-bold">Hasil Pencarian</h1>
+        </div>
         <p className="text-gray-600 mb-6">Ditemukan {rooms.length} kamar sesuai kriteria Anda</p>
         
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -47,28 +68,48 @@ export default function SearchResults({ auth, rooms, filters }: Props) {
               <h2 className="text-xl font-semibold mb-4">Filter Kamar</h2>
               
               <form onSubmit={handleFilter}>
-                <div className="mb-4">
+                <div className="mb-6">
                   <label className="block text-gray-700 text-sm font-medium mb-2">
                     Rentang Harga (per malam)
                   </label>
-                  <div className="flex items-center space-x-2">
+                  
+                  <div className="px-2 mb-2">
+                    <label className="text-xs text-gray-600 block mb-1">Harga Minimal: {minPriceDisplay}</label>
                     <input
-                      type="number"
+                      type="range"
                       min="0"
+                      max="5000000"
+                      step="100000"
                       value={priceRange[0]}
-                      onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
-                      className="w-full p-2 border rounded"
-                      placeholder="Min"
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        if (value < priceRange[1]) {
+                          setPriceRange([value, priceRange[1]]);
+                        }
+                      }}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                     />
-                    <span>sampai</span>
+                    
+                    <label className="text-xs text-gray-600 block mt-3 mb-1">Harga Maksimal: {maxPriceDisplay}</label>
                     <input
-                      type="number"
+                      type="range"
                       min="0"
+                      max="5000000"
+                      step="100000"
                       value={priceRange[1]}
-                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                      className="w-full p-2 border rounded"
-                      placeholder="Max"
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        if (value > priceRange[0]) {
+                          setPriceRange([priceRange[0], value]);
+                        }
+                      }}
+                      className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
                     />
+                  </div>
+                  
+                  <div className="flex justify-between mt-2">
+                    <span className="text-sm text-gray-600">{minPriceDisplay}</span>
+                    <span className="text-sm text-gray-600">{maxPriceDisplay}</span>
                   </div>
                 </div>
                 
@@ -104,14 +145,14 @@ export default function SearchResults({ auth, rooms, filters }: Props) {
                 
                 <div className="mb-4">
                   <label className="block text-gray-700 text-sm font-medium mb-2">
-                    Lokasi
+                    Lokasi Kamar
                   </label>
                   <input
                     type="text"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                     className="w-full p-2 border rounded"
-                    placeholder="Masukkan lokasi"
+                    placeholder="Masukkan lokasi kamar"
                   />
                 </div>
                 

@@ -1,12 +1,15 @@
 import { Head, useForm } from '@inertiajs/react';
 import { useState } from 'react';
-import { PageProps, Room } from '@/types';
+import { PageProps, Room, Review, User } from '@/types';
 import RoomGallery from '@/components/detail/room-gallery';
 import { Footer } from '@/components/restel-footer';
 import { Header } from '@/components/restel-header';
+import { Link } from '@inertiajs/react';
 
 interface Props extends PageProps {
-  room: Room;
+  room: Room & {
+    reviews: (Review & { user: User })[]
+  };
   rating: number;
   unavailableDates: string[];
 }
@@ -25,17 +28,36 @@ export default function Show({ auth, room, rating, unavailableDates }: Props) {
   
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post(route('reservations.store'));
+    
+    // Update the form data
+    setData({
+      room_id: room.id,
+      start_date: checkIn,
+      end_date: checkOut,
+      guests: guests
+    });
+    
+    // Submit the form with proper callbacks
+    post(route('reservations.store'), {
+      preserveScroll: true,
+      onSuccess: () => {
+        // Direct redirect to the reservations index page
+        window.location.href = route('reservations.index');
+      },
+      onError: (errors) => {
+        console.error('Booking failed:', errors);
+      }
+    });
   };
   
   const handleDateChange = (field: 'start_date' | 'end_date', value: string) => {
     if (field === 'start_date') {
       setCheckIn(value);
+      setData('start_date', value);
     } else {
       setCheckOut(value);
+      setData('end_date', value);
     }
-    
-    setData(field, value);
   };
 
   return (
@@ -45,6 +67,16 @@ export default function Show({ auth, room, rating, unavailableDates }: Props) {
       
       <div className="max-w-7xl mx-auto px-4 py-8">
         <div className="mb-8">
+          <Link
+            href={route('rooms.index')}
+            className="inline-flex items-center text-blue-600 hover:text-blue-800 mb-4"
+          >
+            <svg className="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+            </svg>
+            <span>Back to Rooms</span>
+          </Link>
+          
           <h1 className="text-3xl font-bold mb-2">{room.name}</h1>
           <div className="flex items-center mb-4">
             <span className="bg-blue-100 text-blue-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">{room.type}</span>
@@ -189,6 +221,54 @@ export default function Show({ auth, room, rating, unavailableDates }: Props) {
               <p className="text-gray-500 italic">No facilities listed.</p>
             )}
           </div>
+        </div>
+        
+        {/* Reviews Section */}
+        <div className="mt-12">
+          <h2 className="text-2xl font-bold mb-6">Guest Reviews</h2>
+          {room.reviews && room.reviews.length > 0 ? (
+            <div className="space-y-6">
+              {room.reviews.map((review) => (
+                <div key={review.id} className="bg-gray-50 p-6 rounded-lg">
+                  <div className="flex items-start justify-between">
+                    <div className="flex items-center">
+                      <div className="mr-4">
+                        <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold">
+                          {review.user.name.charAt(0)}
+                        </div>
+                      </div>
+                      <div>
+                        <h3 className="font-medium text-gray-900">{review.user.name}</h3>
+                        <p className="text-sm text-gray-500">{new Date(review.created_at).toLocaleDateString()}</p>
+                      </div>
+                    </div>
+                    <div className="flex">
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <svg 
+                          key={star}
+                          className={`w-5 h-5 ${star <= review.rating ? 'text-yellow-400' : 'text-gray-300'}`} 
+                          fill="currentColor" 
+                          viewBox="0 0 20 20"
+                        >
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                        </svg>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="mt-4 text-gray-700">{review.comment}</p>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="bg-gray-50 p-8 rounded-lg text-center">
+              <p className="text-gray-500">No reviews yet for this room.</p>
+              {auth.user && (
+                <p className="mt-2 text-gray-600">
+                  After staying in this room, you can be the first to leave a review!
+                </p>
+              )}
+            </div>
+          )}
         </div>
         
         <div className="mt-12">

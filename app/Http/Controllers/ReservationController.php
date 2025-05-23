@@ -50,12 +50,20 @@ class ReservationController extends Controller
             return back()->with('error', 'Room is not available for the selected dates');
         }
 
+        // Calculate total price based on number of nights
+        $startDate = new \DateTime($request->start_date);
+        $endDate = new \DateTime($request->end_date);
+        $interval = $startDate->diff($endDate);
+        $nights = $interval->days;
+        $totalPrice = $room->price * $nights;
+
         // Create reservation
         $reservation = new Reservation();
         $reservation->user_id = Auth::id();
         $reservation->start_date = $request->start_date;
         $reservation->end_date = $request->end_date;
         $reservation->status = 'pending';
+        $reservation->total_price = $totalPrice;  // Set calculated total price
         $reservation->save();
 
         // Create reservation item
@@ -63,7 +71,16 @@ class ReservationController extends Controller
         $item->reservation_id = $reservation->id;
         $item->reservable_id = $room->id;
         $item->reservable_type = Room::class;
+        $item->price = $room->price; // Store the current room price
         $item->save();
+
+        if ($request->wantsJson()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Reservation created successfully',
+                'redirect' => route('reservations.show', $reservation->id)
+            ]);
+        }
 
         return redirect()->route('reservations.show', $reservation->id)
             ->with('success', 'Reservation created successfully');

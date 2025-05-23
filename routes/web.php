@@ -34,7 +34,7 @@ Route::get('/search', function () {
 
 Route::get('/detail', function () {
     return Inertia::render('detail');
-})->name('search-result');
+})->name('detail');
 
 Route::resource('/rooms', RoomController::class);
 
