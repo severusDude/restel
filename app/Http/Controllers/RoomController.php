@@ -13,17 +13,16 @@ class RoomController extends Controller
      */
     public function index()
     {
-        $rooms = Room::all();
+        $rooms = Room::with('facilities')->get();
 
-        return Inertia::render('home', [
+        return Inertia::render('Rooms/Index', [
             'rooms' => $rooms
         ]);
     }
 
     public function filter(Request $request)
-    {   
-        // dd("hah");
-        $query = Room::query();
+    {
+        $query = Room::query()->with('facilities');
 
         // Filter by capacity if provided
         if ($request->has('capacity')) {
@@ -39,12 +38,23 @@ class RoomController extends Controller
             $query->where('price', '<=', $request->max_price);
         }
 
+        // Filter by type if provided
+        if ($request->has('type') && $request->type) {
+            $query->where('type', $request->type);
+        }
+
+        // Filter by location if provided
+        if ($request->has('location') && $request->location) {
+            $query->where('location', 'like', '%' . $request->location . '%');
+        }
+
         // Execute the query
         $rooms = $query->get();
 
-        dd($rooms);
-
-        return;
+        return Inertia::render('Rooms/SearchResults', [
+            'rooms' => $rooms,
+            'filters' => $request->all()
+        ]);
     }
 
     /**
@@ -68,15 +78,39 @@ class RoomController extends Controller
      */
     public function show(Room $room)
     {
-        // dd($room);
-        $room->load(['facilities', 'reviews']);
+        $room->load(['facilities', 'reviews.user']);
 
-        // Debug
-        // dd($room->getAverageRating(), $room);
+        // Get room availability for the next 30 days
+        $today = now();
+        $thirtyDaysLater = $today->copy()->addDays(30);
+        
+        // Get unavailable dates (dates with confirmed reservations)
+        $unavailableDates = $room->reservations()
+            ->whereHas('reservation', function ($query) {
+                $query->where('status', 'confirmed');
+            })
+            ->with('reservation')
+            ->get()
+            ->flatMap(function ($item) {
+                $startDate = \Carbon\Carbon::parse($item->reservation->start_date);
+                $endDate = \Carbon\Carbon::parse($item->reservation->end_date);
+                
+                // Generate all dates between start and end
+                $dates = [];
+                for ($date = $startDate; $date->lte($endDate); $date->addDay()) {
+                    $dates[] = $date->format('Y-m-d');
+                }
+                
+                return $dates;
+            })
+            ->unique()
+            ->values()
+            ->all();
 
-        return Inertia::render('detail', [
+        return Inertia::render('Rooms/Show', [
             'room' => $room,
-            'rating' => $room->getAverageRating()
+            'rating' => $room->getAverageRating(),
+            'unavailableDates' => $unavailableDates
         ]);
     }
 
@@ -102,5 +136,51 @@ class RoomController extends Controller
     public function destroy(Room $room)
     {
         //
+    }
+
+    /**
+     * Get featured rooms for homepage
+     */
+    public function featured()
+    {
+        try {
+            $rooms = Room::with(['facilities', 'reviews']) // Include reviews for rating calculation
+                ->orderBy('created_at', 'desc') // Get newest rooms first as fallback
+                ->limit(5)
+                ->get();
+            
+            if ($rooms->isEmpty()) {
+                // If no rooms are found, return a helpful message
+                return response()->json([
+                    'rooms' => [],
+                    'message' => 'No rooms available at this time.'
+                ], 200);
+            }
+            
+            // Calculate average rating for each room
+            $rooms->each(function ($room) {
+                $room->average_rating = $room->getAverageRating();
+                
+                // Ensure each room has a featured image, even if it's a placeholder
+                if (!$room->featured_image) {
+                    $room->featured_image = "https://source.unsplash.com/random/400x250/?hotel,room," . $room->id;
+                }
+            });
+            
+            return response()->json([
+                'rooms' => $rooms,
+                'success' => true
+            ]);
+        } catch (\Exception $e) {
+            // // Log the error for debugging
+            // \Log::error('Error fetching featured rooms: ' . $e->getMessage());
+            
+            // Return a user-friendly error response
+            return response()->json([
+                'rooms' => [],
+                'message' => 'Failed to load rooms. Please try again later.',
+                'success' => false
+            ], 500);
+        }
     }
 }

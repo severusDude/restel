@@ -14,15 +14,10 @@ return new class extends Migration
         Schema::create('reservations', function (Blueprint $table) {
             $table->uuid('id')->primary();
             $table->foreignUuid('user_id')->constrained('users')->cascadeOnDelete();
-            $table->dateTime('start_date');
-            $table->dateTime('end_date');
-            $table->float('total_price')->nullable();
-            $table->enum('status', [
-                'pending',
-                'confirmed',
-                'cancelled',
-                'success'
-            ])->default('pending');
+            $table->date('start_date');
+            $table->date('end_date');
+            $table->string('status')->default('pending');
+            $table->float('total_price')->default(0);
             $table->timestamp('status_date')->nullable();
             $table->timestamps();
         });
@@ -35,4 +30,4 @@ return new class extends Migration
     {
         Schema::dropIfExists('reservations');
     }
-};
+}; 

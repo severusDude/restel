@@ -11,7 +11,7 @@ class ReservationObserver
      */
     public function created(Reservation $reservation): void
     {
-        //
+        // Any logic needed when a reservation is created
     }
 
     // Handle the "updating" event
@@ -27,6 +27,19 @@ class ReservationObserver
      */
     public function updated(Reservation $reservation): void
     {
+        // Handle status changes
+        if ($reservation->isDirty('status')) {
+            $oldStatus = $reservation->getOriginal('status');
+            $newStatus = $reservation->status;
+            
+            // Logic for different status transitions
+            if ($oldStatus === 'pending' && $newStatus === 'confirmed') {
+                // Maybe send confirmation email or notification
+            } elseif ($newStatus === 'cancelled') {
+                // Handle cancellation logic
+            }
+        }
+
         if ($reservation->relationLoaded('items') && $reservation->items->isNotEmpty()) {
             $reservation->updateTotalPrice();
         }
@@ -37,7 +50,7 @@ class ReservationObserver
      */
     public function deleted(Reservation $reservation): void
     {
-        //
+        // Any cleanup needed when a reservation is deleted
     }
 
     /**
