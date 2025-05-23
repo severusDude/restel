@@ -172,8 +172,8 @@ class RoomController extends Controller
                 'success' => true
             ]);
         } catch (\Exception $e) {
-            // Log the error for debugging
-            \Log::error('Error fetching featured rooms: ' . $e->getMessage());
+            // // Log the error for debugging
+            // \Log::error('Error fetching featured rooms: ' . $e->getMessage());
             
             // Return a user-friendly error response
             return response()->json([

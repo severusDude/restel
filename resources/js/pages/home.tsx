@@ -4,7 +4,7 @@ import { MainHome } from '@/components/home/restel-main-home';
 import { Footer } from '@/components/restel-footer';
 import { Link } from '@inertiajs/react';
 
-export default function Home() {
+export default function Home({ rooms }: { rooms: any[] }) {
   return (
     <>
       <Header />
