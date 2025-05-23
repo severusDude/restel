@@ -36,6 +36,7 @@ Route::get('/detail', function () {
     return Inertia::render('detail');
 })->name('detail');
 
+Route::get('/rooms/filter', [RoomController::class, 'filter'])->name('rooms.filter');
 Route::resource('/rooms', RoomController::class);
 
 Route::get('/filter', [RoomController::class, 'filter'])->name('rooms.filter');

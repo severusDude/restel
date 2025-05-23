@@ -10,7 +10,7 @@ export default function Home() {
       <Header />
       <RestelBanner />
       <div className="h-28"></div>
-      <MainHome />
+      <MainHome rooms={rooms} />
       <Footer />
     </>
   );

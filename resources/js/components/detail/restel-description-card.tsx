@@ -1,24 +1,24 @@
 import { FacitiesList } from "./description-facilities-list";
 
-export function DescriptionCard() {
+export function DescriptionCard({ room, rating } : any) {
   return (
     <>
       <div className="flex-[8] bg-white rounded-lg shadow-sm border border-gray-100 p-6">
         <div className="mb-4">
-          <span className="bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded">VIP ROOM</span>
+          <span className="bg-blue-600 text-white text-xs font-medium px-2 py-1 rounded">{room.type}</span>
         </div>
-        <h2 className="text-3xl font-bold text-gray-800 mb-2">VIP Deluxe Sea View Room</h2>
-        <h5 className="text-sm text-blue-600 font-medium mb-4">Enjoy breathtaking ocean views</h5>
+        <h2 className="text-3xl font-bold text-gray-800 mb-2">{room.name}</h2>
+        {/* <h5 className="text-sm text-blue-600 font-medium mb-4">Enjoy breathtaking ocean views</h5> */}
         
         <div className="flex items-center gap-2 mb-6">
           <div className="flex text-yellow-400">
             ★★★★★
           </div>
-          <span className="text-sm text-gray-500">4.8 (127 reviews)</span>
+          <span className="text-sm text-gray-500">{room.rating} (127 reviews)</span>
         </div>
         
         <div className="description mr-5">
-          <p className="text-gray-600 leading-relaxed">Experience luxury with our VIP Deluxe Sea View Room featuring a king-size bed, private balcony, and premium amenities. Perfect for a relaxing getaway with stunning ocean vistas.</p>
+          <p className="text-gray-600 leading-relaxed">{ room.description }</p>
           
           
           {/* Added Facilities Cards Section */}

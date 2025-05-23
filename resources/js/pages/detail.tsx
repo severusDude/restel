@@ -3,12 +3,12 @@ import { MainDetail } from '@/components/detail/restel-main-detail'
 import { Footer } from '@/components/restel-footer'
 import { Header } from '@/components/restel-header'
 
-export default function Detail() {
+export default function Detail({ room, rating }: any) {
   return (
     <>
       <Header />
       <ListRoomInterior />
-      <MainDetail />
+      <MainDetail room={room} rating={rating} />
       <Footer />
     </>
   )
