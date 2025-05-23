@@ -1,12 +1,15 @@
+import { Link, usePage } from '@inertiajs/react';
+import { PageProps } from '@/types';
 import { Navbar } from '@/components/restel-navbar';
 
-
 export function Header() {
-    return (
-      <>
-        <header className="bg-white shadow-lg sticky top-0 z-50">
-          <Navbar />
-        </header>
-      </>
-    );
+  const { auth } = usePage<PageProps>().props;
+
+  return (
+    <>
+      <header className="bg-white shadow-md sticky top-0 z-50">
+        <Navbar />
+      </header>
+    </>
+  );
 }

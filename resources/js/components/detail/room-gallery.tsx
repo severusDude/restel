@@ -15,12 +15,15 @@ export default function RoomGallery({ room }: RoomGalleryProps) {
   ];
 
   const [activeImage, setActiveImage] = useState(0);
+  
+  // Use the featured image from the room if available, otherwise use the first placeholder
+  const mainImage = images[activeImage];
 
   return (
     <div className="space-y-4">
       <div className="relative h-[400px] rounded-lg overflow-hidden">
         <img 
-          src={images[activeImage]} 
+          src={mainImage} 
           alt={`${room.name} - Image ${activeImage + 1}`}
           className="w-full h-full object-cover"
         />

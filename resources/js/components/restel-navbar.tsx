@@ -15,12 +15,12 @@ export function Navbar() {
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               className="px-4 py-2 border border-gray-200 rounded-full text-gray-700 hover:bg-gray-50 transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
-              </svg>
-              <span>Menu</span>
-            </button>
-            
+        </svg>
+        <span>Menu</span>
+      </button>
+
             <Link 
               href={route('rooms.index')}
               className="px-4 py-2 border border-blue-200 rounded-full text-blue-600 hover:bg-blue-50 transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md"
@@ -30,7 +30,7 @@ export function Navbar() {
               </svg>
               <span>Kamar</span>
             </Link>
-          </div>
+      </div>
 
           {/* Center logo */}
           <Link 
@@ -41,7 +41,7 @@ export function Navbar() {
           </Link>
 
           {/* Right section with auth buttons */}
-          <div className="auth flex gap-3">
+      <div className="auth flex gap-3">
             {auth.user ? (
               <div className="flex items-center gap-4">
                 <div className="hidden md:flex items-center mr-3">
@@ -85,10 +85,10 @@ export function Navbar() {
                   target="_self"
                   className="px-4 py-2 border border-blue-100 rounded-full text-blue-600 hover:bg-blue-50 transition-all duration-200 font-medium flex items-center gap-1"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
-                  </svg>
-                  <span>Login</span>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
+          </svg>
+          <span>Login</span>
                 </a>
                 
                 <a 
@@ -96,15 +96,15 @@ export function Navbar() {
                   target="_self"
                   className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full text-white hover:from-blue-600 hover:to-blue-700 transition-all duration-200 font-medium shadow-md hover:shadow-lg flex items-center gap-1"
                 >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z" />
-                  </svg>
-                  <span>Register</span>
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+            <path d="M8 9a3 3 0 100-6 3 3 0 000 6zM8 11a6 6 0 016 6H2a6 6 0 016-6z" />
+          </svg>
+          <span>Register</span>
                 </a>
               </>
             )}
-          </div>
-        </nav>
+      </div>
+    </nav>
         
         {/* Mobile menu */}
         {mobileMenuOpen && (
@@ -181,4 +181,4 @@ export function Navbar() {
         )}
       </>
     );
-} 
+}

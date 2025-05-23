@@ -100,7 +100,7 @@ export default function Index({ auth, reservations }: Props) {
                   
                   <div className="mt-4 flex justify-between items-center">
                     <div className="text-gray-700">
-                      <p>Total Price: <span className="font-semibold">${reservation.total_price}</span></p>
+                      <p>Total Price: <span className="font-semibold">Rp {reservation.total_price.toLocaleString()}</span></p>
                       <p className="text-sm text-gray-500">Booked on {formatDate(reservation.created_at)}</p>
                     </div>
                     

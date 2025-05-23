@@ -72,6 +72,24 @@ class RoomFactory extends Factory
     }
 
     /**
+     * Cari gambar dari Unsplash API jika semua gambar gagal
+     */
+    protected function searchUnsplashImage(string $type): ?string
+    {
+        try {
+            $query = urlencode($type . ' hotel room');
+            $url = "https://api.unsplash.com/search/photos?query={$query}&client_id=YOUR_UNSPLASH_ACCESS_KEY&per_page=1";
+            $response = Http::get($url);
+            if ($response->successful() && isset($response['results'][0]['urls']['regular'])) {
+                return $response['results'][0]['urls']['regular'];
+            }
+        } catch (\Exception $e) {
+            // ignore
+        }
+        return null;
+    }
+
+    /**
      * Dapatkan gambar yang valid untuk tipe kamar
      */
     protected function getValidImageForRoomType(string $type): string
@@ -92,7 +110,13 @@ class RoomFactory extends Factory
             return static::$defaultImages[$type];
         }
 
-        // Jika default image juga tidak valid, gunakan placeholder
+        // Jika default image juga tidak valid, cari gambar dari Unsplash
+        $unsplashImage = $this->searchUnsplashImage($type);
+        if ($unsplashImage && $this->isImageValid($unsplashImage)) {
+            return $unsplashImage;
+        }
+
+        // Jika semua gagal, gunakan placeholder
         return 'https://placehold.co/600x400?text=' . urlencode($type);
     }
 
@@ -147,7 +171,7 @@ class RoomFactory extends Factory
                 'description' => $template['description'],
                 'type' => $type,
                 'capacity' => $template['capacity'],
-                'price' => $template['price'],
+                'price' => $this->faker->numberBetween(100000, 500000),
                 'location' => $location,
                 'featured_image' => $featuredImage,
             ];

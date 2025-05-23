@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 import { PageProps, Reservation, ReservationItem } from '@/types';
 import { AppShell } from '@/Components/app-shell';
+import { formatRupiah } from '@/helpers/currency';
 
 interface Props extends PageProps {
   reservation: Reservation;
@@ -108,7 +109,7 @@ export default function Show({ auth, reservation }: Props) {
                     <span className="font-medium">Duration:</span> {calculateNights(reservation.start_date, reservation.end_date)} nights
                   </li>
                   <li>
-                    <span className="font-medium">Total Price:</span> Rp {reservation.total_price.toLocaleString()}
+                    <span className="font-medium">Total Price:</span> {formatRupiah(reservation.total_price)}
                   </li>
                   <li>
                     <span className="font-medium">Booked on:</span> {formatDate(reservation.created_at)}
@@ -152,7 +153,7 @@ export default function Show({ auth, reservation }: Props) {
                     <h3 className="text-lg font-semibold">{item.reservable?.name}</h3>
                     <p className="text-gray-600">{item.reservable?.location}</p>
                     <p className="text-gray-600">Type: {item.reservable?.type}</p>
-                    <p className="text-gray-600">Price: Rp {item.price.toLocaleString()}</p>
+                    <p className="text-gray-600">Price: {formatRupiah(item.price)}</p>
                   </div>
                   
                   {reservation.status === 'confirmed' && (
